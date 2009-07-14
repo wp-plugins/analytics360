@@ -5,7 +5,7 @@
 			<a href="http://analytics.google.com">visit Google Analytics &raquo;</a> | 
 			<a href="http://mailchimp.com">visit MailChimp &raquo;</a>
 		</div>
-		<?php echo __('Analytics360°', 'a360'); ?>
+		<?php echo __('Analytics360°', 'analytics360'); ?>
 	</h2>
 	<p class="a360-subhead" id="a360-header-credit">compliments of <a class="a360-mailchimp-link" href="http://mailchimp.com"><span>MailChimp</span></a></p>
 	<p id="a360-notification"><?php echo $notification; ?></p>

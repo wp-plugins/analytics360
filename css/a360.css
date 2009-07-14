@@ -41,6 +41,10 @@ h2.a360-head {
 	font-weight:bold;
 }
 
+.a360-connection-steps {
+	list-style: none;
+	margin-left: 0;
+}
 .a360-connection-steps .a360-subhead {
 	font-size:20px;
 	color:#00576F;
@@ -95,7 +99,6 @@ h2.a360-head {
 	font-style:normal;
 	font-weight:bold;
 	font-family:Helvetica, Arial, sans-serif;
-	margin-right:40px;
 }
 
 .a360-header-links a {

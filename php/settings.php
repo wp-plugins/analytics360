@@ -3,7 +3,7 @@
 	This is version <span class="a360-version-num"><?php echo $a360_version;?></span>.
 	<a href="http://wordpress.org/extend/plugins/analytics360/faq/">FAQ</a> | <a href="http://www.mailchimp.com/support/contact">Feedback</a>
 </p>
-<p>Just <strong>two quick steps</strong> before you can view your Google Analytics and MailChimp stats in WordPress &hellip;</p>
+<p>Just <strong>two quick steps</strong> before you can view your Google Analytics and MailChimp stats in WordPress&hellip;</p>
 
 <ol class="a360-connection-steps">
 	<li>
@@ -11,9 +11,7 @@
 			<li id="a360-create-account-tab">I need to create an account</li>
 			<li id="a360-have-account-tab" class="a360-selected">I have an account</li>
 		</ul>
-		<h3 id="a360-connect-to-mailchimp-head" class="a360-subhead<?php echo ($a360_has_key ? ' complete' : ''); ?>">
-			1) Connect to MailChimp
-		</h3>
+		<h3 id="a360-connect-to-mailchimp-head" class="a360-subhead<?php echo ($a360_has_key ? ' complete' : ''); ?>">Connect to MailChimp</h3>
 		<ul class="a360-tab-contents">
 			<li id="a360-have-account-content">
 
@@ -21,10 +19,10 @@
 					<input type="hidden" name="a360_action" value="update_mc_api_key" />
 					<fieldset class="options">
 						<p class="a360-want-key"<?php echo ($a360_has_key ? ' style="display:none;"' : '');?>>
-							Enter your MailChimp username and password to generate an API key. This key will power Analytics360°.
+							Enter your MailChimp username and password to generate an API key. This key will power Analytics360&deg;.
 						</p>
 						<p class="a360-has-key"<?php echo (!$a360_has_key ? ' style="display:none;"' : '');?>>
-							Your API key powers Analytics360°.
+							Your API key powers Analytics360&deg;.
 						</p>
 						<div class="option a360-has-key"<?php echo (!$a360_has_key ? ' style="display:none;"' : '');?>>
 							<label for="a360_api_key">API Key</label>
@@ -44,7 +42,7 @@
 					</fieldset>
 					
 					<p class="submit a360-want-key" <?php echo ($a360_has_key ? ' style="display:none;"' : '');?>>
-						<input type="submit" name="submit" value="<?php echo __('Submit', 'a360');?>" id="a360-submit-mc-userpass"/>
+						<input type="submit" name="submit" value="<?php echo __('Submit', 'analytics360');?>" id="a360-submit-mc-userpass"/>
 					</p>
 				</form>
 				
@@ -99,7 +97,7 @@
 				$http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 				curl_close($ch);
 				$ga_auth_error = '';
-				if($http_code != 200) {
+				if ($http_code != 200) {
 					$ga_auth_error = $result;
 				}
 				else {
@@ -129,32 +127,28 @@
 							}
 						}
 					}
-					else {
-					}
 				}
 			}
 		}
 
 ?>
-		<h3 id="a360-connect-to-google-head" class="a360-subhead<?php echo (!empty($a360_ga_token) ? ' complete' : '') ?>">
-			2) Connect to Google Analytics
-		</h3>
+		<h3 id="a360-connect-to-google-head" class="a360-subhead<?php echo (!empty($a360_ga_token) ? ' complete' : '') ?>">Connect to Google Analytics</h3>
 
 <?php if (empty($a360_ga_token)) : ?>
 
-		<strong>Authenticate with Google.</strong><br/>
-		Follow this link to be taken to Google's authentication page. After logging in there, you will be returned to Analytics360°.<br/>
-		<a href="<?php echo $authenticate_url; ?>">Begin Authentication</a>
+		<p><strong>Authenticate with Google.</strong></p>
+		<p>Follow this link to be taken to Google's authentication page. After logging in there, you will be returned to Analytics360&deg;.</p>
+		<p><a href="<?php echo $authenticate_url; ?>">Begin Authentication</a></p>
 
 <?php else : ?>
 
 	<?php if (!empty($ga_auth_error)) : ?>
 
-		<strong>Hmm. Something's wrong with your Google authentication! <span style="color:red;"><?php echo $ga_auth_error;?></span>.</strong>
+		<p><strong>Hmm. Something's wrong with your Google authentication! <span style="color:red;"><?php echo htmlspecialchars($ga_auth_error);?></span>.</strong></p>
 
 	<?php elseif (!empty($connection_error)) : ?>
 	
-		<strong>Darn! You should have access to an account, but we couldn't connect to google! The error was: <span style="color:red;"><?php echo $connection_error; ?></span></strong>
+		<p><strong>Darn! You should have access to an account, but we couldn't connect to google! The error was: <span style="color:red;"><?php echo htmlspecialchars($connection_error); ?></span></strong></p>
 		
 	<?php else : ?>
 
@@ -197,7 +191,7 @@
 		<input type="hidden" name="a360_action" value="revoke_ga_token" />
 		<a id="a360-revoke-ga-auth-link" href="javascript:;">Want to revoke access to this analytics account?</a>
 		<div id="a360-revoke-ga-auth-container" style="display:none;">
-			<label for="a360-revoke-ga-auth">Press this button to revoke Analytics360° access to your Google Analytics account: </label>
+			<label for="a360-revoke-ga-auth">Press this button to revoke Analytics360&deg; access to your Google Analytics account: </label>
 			<input id="a360-revoke-ga-auth" class="button" type="submit" value="Revoke!"/>
 		</div>
 	</form>

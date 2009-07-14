@@ -14,7 +14,7 @@ if (!defined('PLUGINDIR')) {
 	define('PLUGINDIR','wp-content/plugins');
 }
 
-load_plugin_textdomain('a360');
+load_plugin_textdomain('analytics360');
 
 
 if (is_file(trailingslashit(ABSPATH.PLUGINDIR).basename(__FILE__))) {
@@ -140,7 +140,7 @@ function a360_request_handler() {
 
 			case 'capture_ga_token':
 				if (!current_user_can('manage_options')) {
-					wp_die(__('You are not allowed to do that.', 'a360'));
+					wp_die(__('You are not allowed to do that.', 'analytics360'));
 				}
 				$args = array();
 				parse_str($_SERVER['QUERY_STRING'], $args);
@@ -474,15 +474,15 @@ function a360_admin_js() {
 function a360_admin_menu() {
 	if (current_user_can('manage_options')) {
 		add_options_page(
-			__('Settings', 'a360'),
-			__('Analytics360°', 'a360'),
+			__('Settings', 'analytics360'),
+			__('Analytics360°', 'analytics360'),
 			10,
 			basename(__FILE__),
 			'a360_settings_form'
 		);
 		add_dashboard_page(
-			__('Dashboard', 'a360'),
-			__('Analytics360°', 'a360'),
+			__('Dashboard', 'analytics360'),
+			__('Analytics360°', 'analytics360'),
 			10,
 			basename(__FILE__),
 			'a360_dashboard'
@@ -494,7 +494,7 @@ add_action('admin_menu', 'a360_admin_menu');
 function a360_plugin_action_links($links, $file) {
 	$plugin_file = basename(__FILE__);
 	if (basename($file) == $plugin_file) {
-		$settings_link = '<a href="options-general.php?page='.$plugin_file.'">'.__('Settings', 'a360').'</a>';
+		$settings_link = '<a href="options-general.php?page='.$plugin_file.'">'.__('Settings', 'analytics360').'</a>';
 		array_unshift($links, $settings_link);
 	}
 	return $links;
