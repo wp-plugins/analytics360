@@ -22,6 +22,7 @@ Learn more at [MailChimp.com](http://www.mailchimp.com/).
 
 *Note: Analytics360 requires PHP 5.*
 
+
 == Installation ==
 
 1. Unzip the plugin into your `/wp-content/plugins/` directory. If you're uploading it make sure to upload
@@ -60,3 +61,14 @@ Please drop us a line if you find a bug at [http://www.mailchimp.com/support/con
 = Who created this plugin? =
 
 [Analytics360](http://www.mailchimp.com/wordpress_analytics_plugin/?pid=wordpress&source=website) was conceptualized and designed by the folks at [MailChimp](http://mailchimp.com), and developed by [Crowd Favorite](http://crowdfavorite.com/).
+
+
+== Screenshots ==
+
+1. The Analytics360 report dashboard.
+
+
+== Changelog ==
+
+= 1.0 =
+* First public release.
