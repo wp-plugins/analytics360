@@ -4,7 +4,7 @@
 		<h2>Feed The Chimp!</h2>
 		<p>
 			Analytics360° needs to be set up before you can track your stats!
-			<a href="<?php bloginfo('wpurl');?>/wp-admin/options-general.php?page=analytics360.php">Do this on the settings page</a>.
+			<a href="<?php echo site_url('/wp-admin/options-general.php?page=analytics360.php');?>">Do this on the settings page</a>.
 			<?php return; ?>
 		</p>
 	<?php endif; ?> 
@@ -81,7 +81,7 @@
 			<?php if (!$a360_has_key) : ?>
 				<p>
 					Email campaigns can't be shown because you haven't connected to a MailChimp account.
-					<a href="<?php bloginfo('wpurl');?>/wp-admin/options-general.php?page=analytics360.php">Connect to or create a MailChimp account</a>.
+					<a href="<?php echo site_url('/wp-admin/options-general.php?page=analytics360.php');?>">Connect to or create a MailChimp account</a>.
 				</p>
 			<?php endif; ?>
 		</div>
@@ -108,7 +108,7 @@
 				<h4>Oops!</h4>
 				<p>
 					List growth can't be shown because you haven't connected to a MailChimp account.
-					<a href="<?php bloginfo('wpurl');?>/wp-admin/options-general.php?page=analytics360.php">Connect to or create a MailChimp account</a>.
+					<a href="<?php echo site_url('/wp-admin/options-general.php?page=analytics360.php');?>">Connect to or create a MailChimp account</a>.
 				</p>
 			<?php else : ?>
 				<?php if (count($a360_list_options)) : ?>
@@ -147,7 +147,7 @@
 					?>
 					<p>
 						MailChimp activity can't be shown because you have not connected to a MailChimp Account.
-						<a href="<?php bloginfo('wpurl');?>/wp-admin/options-general.php?page=analytics360.php">Connect to or create a MailChimp account</a>.
+						<a href="<?php site_url('/wp-admin/options-general.php?page=analytics360.php');?>">Connect to or create a MailChimp account</a>.
 					</p>
 					<?php
 				}

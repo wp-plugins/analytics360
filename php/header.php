@@ -1,5 +1,4 @@
 <div class="wrap a360-wrap">
-	<div id="prettyprint"></div>
 	<h2 class="a360-head">
 		<div class="a360-header-links">
 			<a href="http://analytics.google.com">visit Google Analytics &raquo;</a> | 

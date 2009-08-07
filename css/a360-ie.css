@@ -44,3 +44,7 @@
 #a360-box-top-referrers .a360-box-content, #a360-box-top-content .a360-box-content {
 	height:333px;
 }
+
+.a360-table-row td, .a360-table-row-hover td, .a360-table-row-odd td, .a360-table-row-selected td {
+	line-height:1em;
+}

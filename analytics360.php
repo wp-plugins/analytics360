@@ -3,7 +3,7 @@
 Plugin Name: Analytics360
 Plugin URI: http://www.mailchimp.com/wordpress_analytics_plugin/?pid=wordpress&source=website
 Description: Allows you to pull Google Analytics and MailChimp data directly into your dashboard, so you can access robust analytics tools without leaving WordPress. Compliments of <a href="http://mailchimp.com/">MailChimp</a>.
-Version: 1.0 
+Version: 1.1rc1 
 Author: Crowd Favorite
 Author URI: http://crowdfavorite.com
 */
@@ -24,7 +24,7 @@ else if (is_file(trailingslashit(ABSPATH.PLUGINDIR).dirname(__FILE__).'/'.basena
 	define('A360_FILE', trailingslashit(ABSPATH.PLUGINDIR).dirname(__FILE__).'/'.basename(__FILE__));
 }
 
-define('A360_VERSION', '1.0');
+define('A360_VERSION', '1.1');
 define('A360_PHP_COMPATIBLE', version_compare(phpversion(), '5', '>='));
 if (!A360_PHP_COMPATIBLE) {
 	trigger_error('Analytics 360&deg; requires PHP 5 or greater.', E_USER_ERROR);
@@ -43,12 +43,12 @@ function a360_admin_init() {
 	
 	if ($a360_page == 'dashboard') {
 		header('X-UA-Compatible: IE=7');	// ask ie8 to behave like ie7 for the sake of vml
-		include(trailingslashit(ABSPATH).'/wp-includes/rss.php');
+		require_once(trailingslashit(ABSPATH).'wp-includes/rss.php');
 	}
 
 	if ($a360_page == 'dashboard') {
 		wp_enqueue_script('jquery');
-		wp_enqueue_script('a360_admin_js', trailingslashit(get_bloginfo('url')).'?a360_action=admin_js&a360_page='.$a360_page, array('jquery'));
+		wp_enqueue_script('a360_admin_js', site_url('?a360_action=admin_js&a360_page='.$a360_page), array('jquery'));
 		wp_enqueue_script('google_jsapi', 'http://www.google.com/jsapi');
 	}
 }
@@ -63,17 +63,17 @@ function a360_admin_head() {
 			<xml:namespace ns="urn:schemas-microsoft-com:vml" prefix="v" >
 		';
 		echo '
-			<link rel="stylesheet" type="text/css" href="'.trailingslashit(get_bloginfo('url')).'?a360_action=admin_css" media="screen" charset="utf-8" />
+			<link rel="stylesheet" type="text/css" href="'.site_url('?a360_action=admin_css').'" media="screen" charset="utf-8" />
 			<!--[if IE]>
-				<link rel="stylesheet" href="'.trailingslashit(get_bloginfo('url')).'?a360_action=admin_css_ie" type="text/css" media="screen" charset="utf-8" />
+				<link rel="stylesheet" href="'.site_url('?a360_action=admin_css_ie').'" type="text/css" media="screen" charset="utf-8" />
 			<![endif]-->
 		';
 		if ($a360_page == 'dashboard' && !empty($a360_ga_token)) {
 			echo '
 				<script type="text/javascript">
 					if (typeof google !== \'undefined\') {
-						google.load("gdata", "1.x");
-						google.load("visualization", "1.x", {"packages": ["areachart", "table", "piechart", "imagesparkline", "geomap", "columnchart"]});
+						google.load("gdata", "1");
+						google.load("visualization", "1", {"packages": ["areachart", "table", "piechart", "imagesparkline", "geomap", "columnchart"]});
 					}
 				</script>
 			';
@@ -84,7 +84,7 @@ function a360_admin_head() {
 add_action('admin_head', 'a360_admin_head');
 
 
-$a360_version = '1.0';
+$a360_version = '1.1';
 $a360_has_key = false;
 $a360_api_key = get_option('a360_api_key');
 
@@ -100,10 +100,12 @@ if (!$a360_has_key) {
 function a360_warn_no_key_plugin_page($plugin_file) {
 	if (strpos($plugin_file, 'analytics360.php')) {
 		print('
-			<tr>
+			<tr class="plugin-update-tr">
 				<td colspan="5" class="plugin-update">
-				<strong>Note</strong>: Analytics360 requires account authentication to work. <a href="options-general.php?page=analytics360.php">Go here to set everything up</a>, then start analyticalizing!.
+				<div class="update-message"
+				<strong>Note</strong>: Analytics360 requires account authentication to work. <a href="options-general.php?page=analytics360.php">Go here to set everything up</a>, then start analyticalizing!
 				</td>
+				</div>
 			</tr>
 		');
 	}
@@ -117,6 +119,85 @@ function a360_MCAPI_is_compatible() {
 		return version_compare($api->version, '1.2', '>=');
 	}
 	return true;
+}
+
+function a360_troubleshoot_message($error = '') {
+	$result = '';
+	if (!empty($error)) {
+		$result .= '<p>The error message was: <span style="color:red;">'.htmlspecialchars($error).'</span>.</p>';
+	}
+	$result .= '
+		<p>If you\'re having trouble getting up and running, you might try one of the following resources:</p>
+		<ul>
+			<li><a href="http://groups.google.com/group/analytics360-discussion">The Analytics360&deg; Google Group</a></li>
+			<li><a href="http://wphelpcenter.com/">WordPress HelpCenter</a>, (512) 788-9236</li>
+		</ul>
+	';
+	return $result;
+}
+
+function a360_check_config() {
+	$curl_has_ssl = false;
+	$php_has_ssl = false;
+	$curl_exists = function_exists('curl_version');
+	if ($curl_exists) {
+		$curl_info = curl_version();
+		if (isset($curl_info['protocols'])) {
+			$curl_has_ssl = in_array('https', $curl_info['protocols']);
+		}
+		else {
+			$curl_has_ssl = !empty($curl_info['ssl_version']);
+		}
+	}
+	if (function_exists('stream_get_wrappers')) {
+		$php_has_ssl = in_array('https', stream_get_wrappers());
+	}
+	return compact('curl_has_ssl', 'php_has_ssl', 'curl_exists');
+}
+
+function a360_warning_box($message, $errors, $extra) {
+	echo '
+		<div class="a360-warning">
+			<h3>'.$message.'</h3>
+	';
+	if (!empty($errors)) {
+		echo '
+			<p>The error message was: <span style="color:#900;">'.htmlspecialchars($errors).'</span>.</p>
+		';
+	}
+	
+	echo $extra;
+	
+	echo a360_troubleshoot_message();
+	echo '</div>';
+}
+
+function a360_config_warnings() {
+	$config_status = a360_check_config();
+	$config_warning = '';
+
+	if ($config_status['curl_exists'] && !$config_status['curl_has_ssl']) {
+		$config_warning .= '<li>The version of cURL running on this server does not support SSL.</li>';
+	}
+	else if (!$config_status['curl_exists'] && !$config_status['php_has_ssl']) {
+		$config_warning .= '<li>The version of PHP running on this server does not support SSL.</li>';
+	}
+
+	if (!empty($config_warning)) {
+		$config_warning = '
+			<p>We just asked your server about a few things and there\'s a chance you\'ll have problems using Analytics360&deg;.</p>
+			<ul>
+				'.$config_warning.'
+			</ul>
+			<p>Analytics360&deg; requires an SSL-enabled transport to work with Google Analytics. You may wish to contact your hosting service or server administrator to ensure that this is possible on your configuration.</p>
+		';
+	}
+	return $config_warning;
+}
+
+function a360_show_ga_auth_error($message, $errors = '') {
+	$config_warnings = a360_config_warnings();
+	a360_warning_box($message, $errors, $config_warnings);
 }
 
 function a360_request_handler() {
@@ -137,34 +218,55 @@ function a360_request_handler() {
 				require('css/a360.css');
 				die();
 			break;
-
 			case 'capture_ga_token':
 				if (!current_user_can('manage_options')) {
 					wp_die(__('You are not allowed to do that.', 'analytics360'));
 				}
 				$args = array();
 				parse_str($_SERVER['QUERY_STRING'], $args);
+
 				$token = NULL;
 				if (isset($args['token'])) {
-					$ch = curl_init('https://www.google.com/accounts/AuthSubSessionToken');
-					curl_setopt($ch, CURLOPT_HEADER, true);
-					curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-					curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
-					curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, true);
-					curl_setopt($ch, CURLOPT_HTTPHEADER, array(
-						'Authorization: AuthSub token="'.$args['token'].'"'
-					));
-					$result = curl_exec($ch);
-					$matches = array();
-					$found = preg_match('/Token=(.*)/', $result, $matches);
-					if ($found) {
-						$token = $matches[1];
-						$result = update_option('a360_ga_token', $token);
+					$wp_http = new WP_Http();
+					$request_args = array(
+						'method' => 'GET',
+						'headers' => a360_get_authsub_headers($args['token']),
+						'sslverify' => false
+					);
+					$response = $wp_http->request(
+						'https://www.google.com/accounts/AuthSubSessionToken',
+						$request_args
+					);
+
+					$error_messages = array();
+					if (is_wp_error($response)) {
+						// couldn't connect
+						$error_messages = $response->get_error_messages();
+					}
+					else if (is_array($response)) {
+						$matches = array();
+						$found = preg_match('/Token=(.*)/', $response['body'], $matches);
+						if ($found) {
+							$token = $matches[1];
+							$result = update_option('a360_ga_token', $token);
+						}
+						else {
+							// connected, but no token in response. 
+							$error_messages = array($repsonse['body']);
+						}
+
 					}
 				}
+
 				if (!$token) {
+					if (count($error_messages)) {
+						$capture_errors .= implode("\n", $error_messages);
+					}
+					else {
+						$capture_errors = 'unknown error';
+					}
 					$q = http_build_query(array(
-						'a360_error' => 'Authentication with Google did not succeed. Please try again.'
+						'a360_ga_token_capture_errors' => $capture_errors
 					));
 				}
 				else {
@@ -173,7 +275,7 @@ function a360_request_handler() {
 						'updated' => true
 					));
 				}
-				wp_redirect(trailingslashit(get_bloginfo('wpurl')).'wp-admin/options-general.php?page='.basename(__FILE__).'&'.$q);
+				wp_redirect(site_url('wp-admin/options-general.php?page='.basename(__FILE__).'&'.$q));
 			break;
 			case 'get_wp_posts':
 				add_filter('posts_where', create_function(
@@ -202,6 +304,13 @@ function a360_request_handler() {
 							'end_start' => $_GET['end_date']
 						));
 						if ($results) {
+							die(cf_json_encode(array(
+								'success' => true,
+								'data' => $results,
+								'cached' => false
+							)));
+						}
+						else if (empty($api->errorCode)) {
 							die(cf_json_encode(array(
 								'success' => true,
 								'data' => $results,
@@ -245,7 +354,7 @@ function a360_request_handler() {
 				
 				// split up top referrals by filtering on each medium in turn
 				if ($_GET['data_type'] == 'top_referrals') {
-					$handles = array(
+					$requests = array(
 						'referral' => null,
 						'organic' => null,
 						'email' => null,
@@ -255,45 +364,45 @@ function a360_request_handler() {
 					$parameters['dimensions'] = 'ga:medium,ga:source';
 					$parameters['metrics'] = 'ga:visits,ga:timeOnSite,ga:pageviews';
 					$parameters['sort'] = '-ga:visits';
-					
-					foreach ($handles as $filter => $handle) {
-						$p = ($filter == '*' ? array('max-results' => 200) : array('filters' => 'ga:medium=='.$filter, 'max-results' => 200));
-						$handles[$filter] = $handle = curl_init('https://www.google.com/analytics/feeds/data?'.http_build_query(array_merge(
-							$parameters,
-							$p
-						)));
-						curl_setopt($handle, CURLOPT_RETURNTRANSFER, true);
-						curl_setopt($handle, CURLOPT_TIMEOUT, 10);
-						curl_setopt($handle, CURLOPT_SSL_VERIFYPEER, true);
-						curl_setopt($handle, CURLOPT_SSL_VERIFYHOST, true);
-						curl_setopt($handle, CURLOPT_HTTPHEADER, array(
-							'Authorization: AuthSub token="'.$a360_ga_token.'"'
-						));
-					}
 
-					$mh = curl_multi_init();
-					foreach ($handles as $handle) {
-						curl_multi_add_handle($mh, $handle);
-					}
-
-					$running = null;
-					do {
-						curl_multi_exec($mh, $running);
-					} while ($running > 0);
-					
 					$all_results = array();
-					foreach ($handles as $filter => $handle) {
-						$http_code = curl_getinfo($handle, CURLINFO_HTTP_CODE);
-						if (substr($http_code, 0, 1) == '2') {
-							$all_results[$filter] = a360_reportObjectMapper(curl_multi_getcontent($handle));
+
+					foreach ($requests as $filter => $request) {
+						$p = ($filter == '*' ? array('max-results' => 200) : array('filters' => 'ga:medium=='.$filter, 'max-results' => 200));
+						$requests[$filter] = $request = new WP_Http();
+						$all_results[$filter] = $request->request(
+							'https://www.google.com/analytics/feeds/data?'.http_build_query(array_merge(
+								$parameters,
+								$p
+							)),
+							array(
+								'headers' => a360_get_authsub_headers(),
+								'timeout' => 10,
+								'sslverify' => false
+							)
+						);
+					}
+
+					foreach ($all_results as $filter => $results) {
+						if (is_wp_error($results)) {
+							header('Content-type: text/javascript');
+							die(cf_json_encode(array(
+								'success' => false,
+								'error' => implode('<br/>', $results->get_error_messages())
+							)));
+						}
+						if (substr($results['response']['code'], 0, 1) == '2') {
+							$all_results[$filter] = a360_reportObjectMapper($results['body']);
 						}
 						else {
-							$all_results[$filter] = curl_multi_getcontent($handle);
+							header('Content-type: text/javascript');
+							die(cf_json_encode(array(
+								'success' => false,
+								'error' => $results['body']
+							)));
 						}
-						curl_multi_remove_handle($mh, $handle);
 					}
-					curl_multi_close($mh);
-
+					
 					header('Content-type: text/javascript');
 					die(cf_json_encode(array(
 						'success' => true,
@@ -352,32 +461,31 @@ function a360_request_handler() {
 						default:
 						break;
 					}
-
-					$ch = curl_init('https://www.google.com/analytics/feeds/data?'.http_build_query($parameters));
-					curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-					curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
-					curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, true);
-					curl_setopt($ch, CURLOPT_TIMEOUT, 10);
-					curl_setopt($ch, CURLOPT_HTTPHEADER, array(
-						'Authorization: AuthSub token="'.$a360_ga_token.'"'
-					));
-
-					$result = curl_exec($ch);
+					
+					$wp_http = new WP_Http();
+					$url = 'https://www.google.com/analytics/feeds/data?'.http_build_query($parameters);
+					$request_args = array(
+						'headers' => a360_get_authsub_headers(),
+						'timeout' => 10,
+						'sslverify' => false
+					);
+					$result = $wp_http->request(
+						$url,
+						$request_args
+					);
 				}
 
 
-				if (!$result) {
+				if (is_wp_error($result)) {
 					header('Content-type: text/javascript');
 					die(cf_json_encode(array(
 						'success' => false,
-						'error' => curl_error($ch)
+						'error' => implode('<br/>', $result->get_error_messages())
 					)));
 				}
 
-				$http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-				if (substr($http_code, 0, 1) == '2') {
-					
-					$result = a360_reportObjectMapper($result);
+				if (substr($result['response']['code'], 0, 1) == '2') {
+					$result = a360_reportObjectMapper($result['body']);
 
 					header('Content-type: text/javascript');
 					die(cf_json_encode(array(
@@ -390,7 +498,7 @@ function a360_request_handler() {
 					header('Content-type: text/javascript');
 					die(cf_json_encode(array(
 						'success' => false,
-						'error' => $result
+						'error' => $result['body']
 					)));
 				}
 			break;
@@ -407,43 +515,58 @@ function a360_request_handler() {
 						$q = http_build_query(array('updated' => 'true'));
 					}
 					else {
-						$q = http_build_query(array('a360_error' => $key_result['error']));
+						$q = http_build_query(array('a360_mc_auth_error' => $key_result['error']));
 					}
 				}
-				wp_redirect(trailingslashit(get_bloginfo('wpurl')).'wp-admin/options-general.php?page='.basename(__FILE__).'&'.$q);
+				wp_redirect(site_url('wp-admin/options-general.php?page='.basename(__FILE__).'&'.$q));
 				die();
 			break;
 			case 'clear_mc_api_key':
 				delete_option('a360_api_key');
 				delete_option('a360_chimp_chatter_url');
-				wp_redirect(trailingslashit(get_bloginfo('wpurl')).'wp-admin/options-general.php?page='.basename(__FILE__).'&'.http_build_query(array('updated' => 'true')));
+				wp_redirect(site_url('wp-admin/options-general.php?page='.basename(__FILE__).'&'.http_build_query(array('updated' => 'true'))));
 			break;
 			case 'revoke_ga_token':
 				global $a360_ga_token;
-				$ch = curl_init('https://www.google.com/accounts/AuthSubRevokeToken');
-				curl_setopt($ch, CURLOPT_HEADER, true);
-				curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-				curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
-				curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, true);
-				curl_setopt($ch, CURLOPT_HTTPHEADER, array(
-					'Authorization: AuthSub token="'.$a360_ga_token.'"'
-				));
-				$result = curl_exec($ch);
-				$http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-				if ($http_code == 200) {
+				$wp_http = new WP_Http();
+				$request_args = array(
+					'headers' => a360_get_authsub_headers(),
+					'sslverify' => false
+				);
+				$response = $wp_http->request(
+					'https://www.google.com/accounts/AuthSubRevokeToken',
+					$request_args
+				);
+				if ($response['response']['code'] == 200) {
 					delete_option('a360_ga_token');
 					delete_option('a360_ga_profile_id');
-					wp_redirect(trailingslashit(get_bloginfo('wpurl')).'wp-admin/options-general.php?page='.basename(__FILE__).'&update=true');
+					wp_redirect(site_url('wp-admin/options-general.php?page='.basename(__FILE__).'&update=true'));
+				}
+				else if ($response['response']['code'] == 403) {
+					wp_redirect(site_url('wp-admin/options-general.php?page='.basename(__FILE__).'&'.http_build_query(array(
+						'a360_revoke_token_chicken_and_egg' => $response['response']['code'].': '.$response['response']['message']
+					))));
 				}
 				else {
-					wp_redirect(trailingslashit(get_bloginfo('wpurl')).'wp-admin/options-general.php?page='.basename(__FILE__).'&'.http_build_query(array(
-						'a360_error' => 'Could not revoke token!'
-					)));
+					if (is_wp_error($response)) {
+						$errors = $response->get_error_messages();
+					}
+					else {
+						$errors = array($response['response']['code'].': '.$response['response']['message']);
+					}
+					wp_redirect(site_url('wp-admin/options-general.php?page='.basename(__FILE__).'&'.http_build_query(array(
+						'a360_error' => implode("\n", $errors)
+					))));
 				}
+			break;
+			case 'forget_ga_token':
+				delete_option('a360_ga_token');
+				delete_option('a360_ga_profile_id');
+				wp_redirect(site_url('wp-admin/options-general.php?page='.basename(__FILE__).'&update=true'));
 			break;
 			case 'set_ga_profile_id':
 				$result = update_option('a360_ga_profile_id', $_POST['profile_id']);
-				wp_redirect(trailingslashit(get_bloginfo('wpurl')).'wp-admin/options-general.php?page='.basename(__FILE__).'&updated=true');
+				wp_redirect(site_url('wp-admin/options-general.php?page='.basename(__FILE__).'&updated=true'));
 			break;
 		}
 	}
@@ -468,8 +591,32 @@ function a360_admin_js() {
 	die();
 }
 
-
-
+/**
+ * Work around a bug in WP 2.7's implementation of WP_Http running on cURL.
+ */
+function a360_get_authsub_headers($token = null) {
+	global $wp_version, $a360_ga_token;
+	static $use_assoc = null;
+	if (is_null($use_assoc)) {
+		// slow, but little other way to guarantee what it'll be running on.
+		// and even if curl is first in the list, WP_Http will try a different 
+		// transport if curl errors out for some reason.
+		$http = new WP_Http();
+		$transports = $http->_getTransport();
+		$wp_http_likes_curl = count($transports) && (get_class($transports[0]) == 'WP_Http_Curl');
+		if (version_compare($wp_version, '2.8', '<') && $wp_http_likes_curl) {
+			$use_assoc = false;
+		}
+		else {
+			$use_assoc = true;
+		}
+	}
+	$token = (is_null($token) ? $a360_ga_token : $token);
+	if (!$use_assoc) {
+		return array('Authorization: AuthSub token="'.$token.'"');
+	}
+	return array('Authorization' => 'AuthSub token="'.$token.'"');
+}
 
 function a360_admin_menu() {
 	if (current_user_can('manage_options')) {
@@ -509,6 +656,7 @@ function a360_settings_form() {
 			'<span class="error" style="padding:3px;"><strong>Error</strong>: '.stripslashes($_GET['a360_error']).'</span>' : 
 			''
 	);
+		
 	include('php/header.php');
 	include('php/settings.php');
 	include('php/footer.php');
@@ -631,6 +779,7 @@ function a360_fetch_API_key($username, $password) {
  */
 function a360_reportObjectMapper($xml_string) {
 	$xml = simplexml_load_string($xml_string);
+
 
 	$results = null;
 	$results = array();

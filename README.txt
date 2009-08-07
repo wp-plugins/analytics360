@@ -3,7 +3,7 @@
 Contributors: crowdfavorite, alexkingorg
 Tags: analytics, google-analytics, email, statistics, stats, dashboard
 Requires at least: 2.7
-Tested up to: 2.8.1
+Tested up to: 2.8.3
 Stable tag: 1.0
 
 MailChimp's Analytics360 plugin allows you to pull Google Analytics and MailChimp data directly into your dashboard, so you can access robust analytics tools without leaving WordPress.
@@ -40,11 +40,11 @@ Google publishes Analytics data once a day around 8PM GMT.
 
 = Do I have to have a MailChimp account to use this plugin? =
 
-No, you can use the Analytics360 plugin without a MailChimp account, but users of MailChimp will see data about traffic sent to their blog via email campaigns aggregated with other stats. Use MailChimp for free if your list has less than 100 subscribers, or upgrade to send to more. Learn more at [MailChimp.com](http://mailchimp.com).
+No, you can use the Analytics360 plugin without a MailChimp account, but users of MailChimp will see data about traffic sent to their blog via email campaigns aggregated with other stats. Use MailChimp for free if your list has less than 100 subscribers, or upgrade to send to more. Learn more at [MailChimp.com](http://mailchimp.com "Email Marketing from MailChimp").
 
 = What's MailChimp? =
 
-MailChimp is an easy to use tool for designing, sending, and tracking email campaigns. Learn more at [MailChimp.com](http://mailchimp.com)
+MailChimp is an easy to use tool for designing, sending, and tracking email campaigns. Learn more at [MailChimp.com](http://mailchimp.com "Email Marketing from MailChimp")
 
 = How do I add a MailChimp mailing list signup form to my WordPress blog? =
 
@@ -54,21 +54,35 @@ Use the [MailChimp WordPress plugin](http://www.mailchimp.com/plugins/mailchimp-
 
 Yes, the Analytics360 plugin requires PHP 5. If you attempt to activate the plugin and PHP 5 is not available you will be presented with an error. 
 
-= How do I report a bug? =
+= How do I report a bug or feature request? =
 
-Please drop us a line if you find a bug at [http://www.mailchimp.com/support/contact](http://www.mailchimp.com/support/contact).
+Please drop us a line if you find a bug or would like to see a new feature added at:   [http://groups.google.com/group/analytics360-discussion](http://groups.google.com/group/analytics360-discussion). You can also contact the [WordPress HelpCenter](http://wphelpcenter.com/) for immediate support requests.
 
 = Who created this plugin? =
 
-[Analytics360](http://www.mailchimp.com/wordpress_analytics_plugin/?pid=wordpress&source=website) was conceptualized and designed by the folks at [MailChimp](http://mailchimp.com), and developed by [Crowd Favorite](http://crowdfavorite.com/).
+[Analytics360](http://www.mailchimp.com/wordpress_analytics_plugin/?pid=wordpress&source=website) was conceptualized and designed by the folks at [MailChimp](http://mailchimp.com "Email Marketing from MailChimp"), and developed by [Crowd Favorite](http://crowdfavorite.com/ "Custom WordPress and web development").
 
 
 == Screenshots ==
 
 1. The Analytics360 report dashboard.
+2. See where in the world your traffic is coming from.
+3. See what sites are sending traffic, and dig in to see what stories they're linking.
+4. Compare traffic sources to one another.
+5. See all your vital Google Analytics data in your WordPress dashboard.
 
 
 == Changelog ==
+
+= 1.1 =
+* Traffic Chart visualization fixes (eg: Y-axis scale begins at 0)
+* Inclusion of wp-includes/rss.php switched to include\_once
+* Switched plugin links to use site\_url
+* Replaced usage of `curl` with HTTP API request class
+* Verbose error messages on settings page added to help troubleshooting
+* Minimized some JavaScript for smaller download footprints
+* Switched to use "stable" Google apis, rather than development
+* Fixed issue where some UI elements could be hidden in Internet Explorer using 2.8
 
 = 1.0 =
 * First public release.

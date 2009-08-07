@@ -379,13 +379,6 @@
 							}
 						});
 					}
-				}).bind('dpMonthChanged', function(event, displayedMonth, displayedYear) {
-					// uncomment if you have firebug and want to confirm this works as expected...
-					//console.log('dpMonthChanged', arguments);
-				}).bind('dateSelected', function(event, date, $td, status) {
-					//console.debug(event, date, $td, status);
-					// uncomment if you have firebug and want to confirm this works as expected...
-					//console.log('dateSelected', arguments);
 				});
 				$('#a360-datepicker-calendars').data('datepicker', dpmm);
 			}
@@ -725,7 +718,7 @@
 			listData.setCell(i, 3, parseInt(month.existing, 10));
 		});
 
-		var d = $('#a360-list-growth-chart').width() * 0.9;
+		var d = $('#a360-list-growth-chart').parent().width() * 0.9;
 		$('#a360-list-growth-chart').width(Math.min(d, 350));
 		var chart = new google.visualization.ColumnChart($('#a360-list-growth-chart').empty().get(0));
 		chart.draw(listData, {
@@ -747,7 +740,7 @@
 		var startCoords = [];
 		var valueToY = function(value) {
 			return a360.lineChart.height + a360.lineChart.offsetY - (
-				(value / a360.lineChart.maxValue) * (a360.lineChart.height + a360.lineChart.offsetY - a360.lineChart.minY)
+				(value - a360.lineChart.bottomLineValue) / (a360.lineChart.topLineValue - a360.lineChart.bottomLineValue) * a360.lineChart.height
 			);
 		};
 		
@@ -797,18 +790,16 @@
 		} 
 		else {
 			visitData.addRows(a360.visitStats.nDays);
-			a360.lineChart.maxValue = 0;
 
 			i = 0;
 			$.each(a360.visitStats.days, function(dateKey, day) {
 				visitData.setCell(i, 0, day.date);
 				visitData.setCell(i, 1, day.getVisits('all traffic'));
-				a360.lineChart.maxValue = Math.max(a360.lineChart.maxValue, day.getVisits('all traffic'));
 				visitData.setProperty(i, 1, 'dayStats', day);
 				i++;
 			});
 		}
-		
+
 		$('#a360-box-site-traffic ul.a360-tabs').empty();
 		$.each(a360.visitStats.mediumSummaries, function(name, summary) {
 			if (['all traffic', 'cpc', 'email', 'organic', 'referral'].indexOf(name) >= 0) {
@@ -858,10 +849,36 @@
 				a360.gfx.setStrokeColor($('#a360-all-traffic-graph rect:first'), '#ffffff');	// ie wub
 				
 				if (a360.gfx.renderer == 'svg') {
+					
+					var yAxisValues = $('text').map(function() {
+						if (this.getAttribute('transform') !== null) {
+							return null;
+						}
+						else {
+							return parseFloat(this.childNodes[0].textContent.replace(/,/g, ''));
+						}
+					});
+					a360.lineChart.topLineValue = yAxisValues[yAxisValues.length - 1];
+					a360.lineChart.bottomLineValue = yAxisValues[0];
+					
+					// copy a background "all traffic" fill area
 					var chartFill = $('path[fill=#92BCD0]');
 					a360.gfx.setFillColor(chartFill.clone().insertBefore(chartFill), '#cfcfcf');
 				}
 				else {
+					
+					var yAxisValues = $('textpath').map(function() {
+						if (this.string.indexOf(' ') > -1) {
+							return null;
+						}
+						else {
+							return parseFloat(this.string.replace(/,/g, ''));
+						}
+					});
+					a360.lineChart.topLineValue = yAxisValues[yAxisValues.length - 1];
+					a360.lineChart.bottomLineValue = yAxisValues[0];
+
+					// @todo: get the background fill working in IE
 					//var chartFill = $('shape:eq(' + ($('shape').size() - 2) + ')');
 					//var clonedFill = chartFill.clone().insertBefore(chartFill);
 					//$('fill', clonedFill).attr('color', '#cfcfcf').attr('id', 'blah');
@@ -869,14 +886,9 @@
 				
 
 				var circles = a360.lineChart.jqCircles = $(a360.gfx.circleName, graphics);
-				a360.lineChart.minY = Number.MAX_VALUE;
 				circles.each(function(index) {
 
 					$(this).attr('onclick', null);
-					
-					// minY is the maximum height we have ... note that we 
-					// have to be sure to measure this on the "all traffic" medium
-					a360.lineChart.minY = Math.min(a360.lineChart.minY, a360.gfx.getCenterOffset(this).top);
 
 					$(this).hover(function() {
 						a360.gfx.setStrokeWeight($(this), $(this).data('strokeWeight') + 1);
@@ -952,7 +964,8 @@
 			borderColor: '#92BCD0',
 			colors: ['#92BCD0'],
 			axisFontSize: 11,
-			enableTooltip: false
+			enableTooltip: false,
+			min: 0
 		});
 
 	};
@@ -1198,12 +1211,12 @@
 		iframeDoc: null,
 		jqCircles: null,
 		visitData: null,
-		maxValue: 0,
 		
 		drawFrame: null,
 		height: null,
 		offsetY: null,
-		minY: Number.MAX_VALUE
+		topLineValue: 0,
+		bottomLineValue: 0
 	};
 	
 	a360.maxFetchAttempts = 10;
