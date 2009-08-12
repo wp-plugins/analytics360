@@ -4,7 +4,7 @@ Contributors: crowdfavorite, alexkingorg
 Tags: analytics, google-analytics, email, statistics, stats, dashboard
 Requires at least: 2.7
 Tested up to: 2.8.3
-Stable tag: 1.0
+Stable tag: 1.1
 
 MailChimp's Analytics360 plugin allows you to pull Google Analytics and MailChimp data directly into your dashboard, so you can access robust analytics tools without leaving WordPress.
 
@@ -53,6 +53,10 @@ Use the [MailChimp WordPress plugin](http://www.mailchimp.com/plugins/mailchimp-
 = Does the plugin have any minimum requirements? =
 
 Yes, the Analytics360 plugin requires PHP 5. If you attempt to activate the plugin and PHP 5 is not available you will be presented with an error. 
+
+= Why does Google Authentication fail, with Google telling me that my site is not registered? = 
+
+This is a known issue with Google Data API authentication, affecting some domains. This [Google Groups thread](http://groups.google.com/group/Google-Accounts-API/browse_thread/thread/84556800fcc0cf55/5c274154d6ba6e38) may have the latest information regarding the problem (note: it is not limited to international TLDs).
 
 = How do I report a bug or feature request? =
 
