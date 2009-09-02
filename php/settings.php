@@ -1,6 +1,6 @@
 
 <p>
-	This is version <span class="a360-version-num"><?php echo $a360_version;?></span>.
+	This is version <span class="a360-version-num"><?php echo A360_VERSION;?></span>.
 	<a href="http://wordpress.org/extend/plugins/analytics360/faq/">FAQ</a> | <a href="http://groups.google.com/group/analytics360-discussion">Feedback</a>
 </p>
 <p>Just <strong>two quick steps</strong> before you can view your Google Analytics and MailChimp stats in WordPress&hellip;</p>

@@ -3,7 +3,7 @@
 Plugin Name: Analytics360
 Plugin URI: http://www.mailchimp.com/wordpress_analytics_plugin/?pid=wordpress&source=website
 Description: Allows you to pull Google Analytics and MailChimp data directly into your dashboard, so you can access robust analytics tools without leaving WordPress. Compliments of <a href="http://mailchimp.com/">MailChimp</a>.
-Version: 1.1
+Version: 1.2
 Author: Crowd Favorite
 Author URI: http://crowdfavorite.com
 */
@@ -24,7 +24,7 @@ else if (is_file(trailingslashit(ABSPATH.PLUGINDIR).dirname(__FILE__).'/'.basena
 	define('A360_FILE', trailingslashit(ABSPATH.PLUGINDIR).dirname(__FILE__).'/'.basename(__FILE__));
 }
 
-define('A360_VERSION', '1.1');
+define('A360_VERSION', '1.2');
 define('A360_PHP_COMPATIBLE', version_compare(phpversion(), '5', '>='));
 if (!A360_PHP_COMPATIBLE) {
 	trigger_error('Analytics 360&deg; requires PHP 5 or greater.', E_USER_ERROR);
@@ -84,7 +84,6 @@ function a360_admin_head() {
 add_action('admin_head', 'a360_admin_head');
 
 
-$a360_version = '1.1';
 $a360_has_key = false;
 $a360_api_key = get_option('a360_api_key');
 
@@ -94,22 +93,35 @@ if ($a360_api_key && !empty($a360_api_key)) {
 	$a360_has_key = true;
 }
 
-if (!$a360_has_key) {
-	add_action('after_plugin_row', 'a360_warn_no_key_plugin_page');
-}
-function a360_warn_no_key_plugin_page($plugin_file) {
+function a360_warn_on_plugin_page($plugin_file) {
 	if (strpos($plugin_file, 'analytics360.php')) {
-		print('
-			<tr class="plugin-update-tr">
-				<td colspan="5" class="plugin-update">
-				<div class="update-message"
-				<strong>Note</strong>: Analytics360 requires account authentication to work. <a href="options-general.php?page=analytics360.php">Go here to set everything up</a>, then start analyticalizing!
-				</td>
-				</div>
-			</tr>
-		');
+		global $a360_has_key, $a360_ga_token;
+		$mc_setup = $a360_has_key;
+		$ga_setup = (isset($a360_ga_token) && !empty($a360_ga_token));
+		$message = '';
+		if (!$mc_setup && !$ga_setup) {
+			$message = '<strong>Note</strong>: Analytics360&deg; requires account authentication to work. <a href="options-general.php?page=analytics360.php">Go here to set everything up</a>, then start analyticalizing!';
+		}
+		else if (!$mc_setup) {
+			$message = '<strong>Note</strong>: You <em>could</em> be doing more with Analytics360&deg! <a href="options-general.php?page=analytics360.php">Log in or set up your MailChimp account</a>!';
+		}
+		else if (!$ga_setup) {
+			$message = '<strong>Note</strong>: Analytics360&deg; has to hook up to your Google Analytics account before it can do anything! <a href="options-general.php?page=analytics360.php">Start the authorization process here</a>!';
+		}
+		if (!empty($message)) {
+			print('
+				<tr class="plugin-update-tr">
+					<td colspan="5" class="plugin-update">
+						<div class="update-message">
+						'.$message.'
+						</div>
+					</td>
+				</tr>
+			');
+		}
 	}
 }
+add_action('after_plugin_row', 'a360_warn_on_plugin_page');
 
 // returns false only when we're not using our own MCAPI, 
 // and the existing version is < 2.1.
@@ -575,8 +587,13 @@ add_action('init', 'a360_request_handler');
 
 
 function a360_admin_js() {
-	global $a360_api_key, $a360_has_key;
+	global $a360_api_key, $a360_has_key, $a360_ga_token;
 	header('Content-type: text/javascript');
+	
+	if ((!isset($a360_ga_token) || empty($a360_ga_token)) && $_GET['a360_page'] == 'dashboard') {
+		// some odd js errors happen if we don't actually have content on the dashboard page.
+		die();
+	}
 	require('js/date-coolite.js');
 	require('js/date.js');
 	require('js/jquery.datePicker.js');
@@ -649,7 +666,7 @@ function a360_plugin_action_links($links, $file) {
 add_filter('plugin_action_links', 'a360_plugin_action_links', 10, 2);
 
 function a360_settings_form() {
-	global $a360_api_key, $a360_has_key, $a360_version, $a360_ga_token;
+	global $a360_api_key, $a360_has_key, $a360_ga_token;
 
 	$notification = (
 		isset($_GET['a360_error']) ? 
@@ -739,11 +756,27 @@ function a360_get_chimp_chatter_url() {
 		if (!empty($api->errorCode)) {
 			return null;
 		}
-		$results = $api->getAffiliateInfo();
+		
+		if (method_exists($api, 'getAccountDetails')) {
+			$result = $api->getAccountDetails();
+		}
+		else {
+			// this call is deprecated, but if user has an old version of MCAPI powering another MC plugin...
+			$result = $api->getAffiliateInfo();
+		}
+		
 		if (!empty($api->errorCode)) {
 			return null;
 		}
-		$url = 'http://us1.admin.mailchimp.com/chatter/feed?u='.$results['user_id'];
+		
+		// determine the right datacenter/endpoint
+    	list($key, $dc) = explode('-', $api->api_key, 2);
+    	if (!$dc) {
+			$dc = 'us1'; 
+		}
+        $host = $dc.'.admin.mailchimp.com';
+
+		$url = 'http://'.$host.'/chatter/feed?u='.$result['user_id'];
 		update_option('a360_chimp_chatter_url', $url);
 		return $url;
 	}
