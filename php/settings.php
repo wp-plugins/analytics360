@@ -27,6 +27,7 @@
 				?>
 				<form id="a360_mc_login_form" name="a360-settings-form" action="<?php echo admin_url('options-general.php');?>" method="post">
 					<input type="hidden" name="a360_action" value="update_mc_api_key" />
+					<input type="hidden" name="a360_nonce" value="<?php echo a360_create_nonce('update_mc_api_key'); ?>" />
 					<fieldset class="options">
 						<p class="a360-want-key"<?php echo ($a360_has_key ? ' style="display:none;"' : '');?>>
 							Enter your MailChimp username and password to generate an API key. This key will power Analytics360&deg;.
@@ -39,7 +40,7 @@
 							<input disabled="disabled" size="32" value="<?php echo $a360_api_key;?>" id="a360_api_key" name="a360_api_key" />
 							<div class="clear"></div>
 						</div>
-						<div class="option a360-want-key"<?php echo ($a360_has_key ? ' style="display:none;"' : '');?>'>
+						<div class="option a360-want-key"<?php echo ($a360_has_key ? ' style="display:none;"' : '');?>>
 							<label for="a360_username">Username</label>
 							<input value="" id="a360_username" name="a360_username" />
 							<div class="clear"></div>
@@ -58,6 +59,7 @@
 				
 				<form id="a360-clear-mc-api-key" action="<?php echo admin_url('options-general.php?page=analytics360.php'); ?>" method="post" class="a360-has-key" <?php echo (!$a360_has_key ? ' style="display:none;"' : '');?>>
 					<input type="hidden" name="a360_action" value="clear_mc_api_key" />
+					<input type="hidden" name="a360_nonce" value="<?php echo a360_create_nonce('clear_mc_api_key'); ?>" />
 					<p>
 						<a id="generate-new-link" href="javascript:;">Connect to a different account</a>, 
 						or just <input type="submit" value="Forget This API Key" class="button" />
@@ -93,7 +95,7 @@
 		else {
 			$url = 'https://www.google.com/analytics/feeds/accounts/default';
 						
-			$wp_http = new WP_Http();
+			$wp_http = a360_get_wp_http();
 			$request_args = array(
 				'headers' => a360_get_authsub_headers(),
 				'sslverify' => false
@@ -195,6 +197,7 @@
 			<?php if (count($profiles) > 1) : ?>
 					<form action="<?php echo admin_url('options-general.php?page=analytics360.php'); ?>" method="post">
 						<input type="hidden" name="a360_action" value="set_ga_profile_id" />
+						<input type="hidden" name="a360_nonce" value="<?php echo a360_create_nonce('set_ga_profile_id'); ?>" />
 						<label for="a360-profile-id-select">From now on track:</label>
 						<select id="a360-profile-id-select" name="profile_id">
 							<?php echo implode("\n", $profile_options); ?>
@@ -217,6 +220,7 @@
 	<?php if (isset($_GET['a360_revoke_token_chicken_and_egg'])) : ?>
 		<form action="<?php echo admin_url('options-general.php?page=analytics360.php'); ?>" method="post" class="a360-revoke-or-forget">
 			<input type="hidden" name="a360_action" value="forget_ga_token" />
+			<input type="hidden" name="a360_nonce" value="<?php echo a360_create_nonce('forget_ga_token'); ?>" />
 			<a id="a360-revoke-ga-auth-link" href="javascript:;">Need to forget your Google Analytics authorization token?</a>
 			<div id="a360-revoke-ga-auth-container" style="display:none;">
 				<label for="a360-revoke-ga-auth">You may need to do this if access to this account has been revoked outside of Analytics360&deg;: </label>
@@ -226,6 +230,7 @@
 	<?php else : ?>
 		<form action="<?php echo admin_url('options-general.php?page=analytics360.php'); ?>" method="post" class="a360-revoke-or-forget">
 			<input type="hidden" name="a360_action" value="revoke_ga_token" />
+			<input type="hidden" name="a360_nonce" value="<?php echo a360_create_nonce('revoke_ga_token'); ?>" />
 			<a id="a360-revoke-ga-auth-link" href="javascript:;">Want to revoke access to this analytics account?</a>
 			<div id="a360-revoke-ga-auth-container" style="display:none;">
 				<label for="a360-revoke-ga-auth">Press this button to revoke Analytics360&deg; access to your Google Analytics account: </label>

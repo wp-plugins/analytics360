@@ -3,7 +3,7 @@
 Plugin Name: Analytics360
 Plugin URI: http://www.mailchimp.com/wordpress_analytics_plugin/?pid=wordpress&source=website
 Description: Allows you to pull Google Analytics and MailChimp data directly into your dashboard, so you can access robust analytics tools without leaving WordPress. Compliments of <a href="http://mailchimp.com/">MailChimp</a>.
-Version: 1.2.1
+Version: 1.2.2
 Author: Crowd Favorite
 Author URI: http://crowdfavorite.com
 */
@@ -24,7 +24,7 @@ else if (is_file(trailingslashit(ABSPATH.PLUGINDIR).dirname(__FILE__).'/'.basena
 	define('A360_FILE', trailingslashit(ABSPATH.PLUGINDIR).dirname(__FILE__).'/'.basename(__FILE__));
 }
 
-define('A360_VERSION', '1.2.1');
+define('A360_VERSION', '1.2.2');
 define('A360_PHP_COMPATIBLE', version_compare(phpversion(), '5', '>='));
 if (!A360_PHP_COMPATIBLE) {
 	trigger_error('Analytics 360&deg; requires PHP 5 or greater.', E_USER_ERROR);
@@ -236,7 +236,7 @@ function a360_request_handler() {
 
 				$token = NULL;
 				if (isset($args['token'])) {
-					$wp_http = new WP_Http();
+					$wp_http = a360_get_wp_http();
 					$request_args = array(
 						'method' => 'GET',
 						'headers' => a360_get_authsub_headers($args['token']),
@@ -286,8 +286,8 @@ function a360_request_handler() {
 				wp_redirect(site_url('wp-admin/options-general.php?page='.basename(__FILE__).'&'.$q));
 			break;
 			case 'get_wp_posts':
-				$start = (preg_match('/\\d{4}-\\d{2}-\\d{2}/', $_GET['start_date']) ? $_GET['start_date'] : '0000-00-00');
-				$end = (preg_match('/\\d{4}-\\d{2}-\\d{2}/', $_GET['end_date']) ? $_GET['end_date'] : '0000-00-00');
+				$start = (preg_match('/^\\d{4}-\\d{2}-\\d{2}$/', $_GET['start_date']) ? $_GET['start_date'] : '0000-00-00');
+				$end = (preg_match('/^\\d{4}-\\d{2}-\\d{2}$/', $_GET['end_date']) ? $_GET['end_date'] : '0000-00-00');
 				add_filter('posts_where', create_function(
 					'$where', 
 					'return $where." AND post_date >= \''.$start.'\' AND post_date < \''.$end.'\'";'
@@ -379,7 +379,7 @@ function a360_request_handler() {
 
 					foreach ($requests as $filter => $request) {
 						$p = ($filter == '*' ? array('max-results' => 200) : array('filters' => 'ga:medium=='.$filter, 'max-results' => 200));
-						$requests[$filter] = $request = new WP_Http();
+						$requests[$filter] = $request = a360_get_wp_http();
 						$all_results[$filter] = $request->request(
 							'https://www.google.com/analytics/feeds/data?'.http_build_query(array_merge(
 								$parameters,
@@ -472,7 +472,7 @@ function a360_request_handler() {
 						break;
 					}
 					
-					$wp_http = new WP_Http();
+					$wp_http = a360_get_wp_http();
 					$url = 'https://www.google.com/analytics/feeds/data?'.http_build_query($parameters);
 					$request_args = array(
 						'headers' => a360_get_authsub_headers(),
@@ -515,6 +515,7 @@ function a360_request_handler() {
 		}
 	}
 	if (!empty($_POST['a360_action']) && current_user_can('manage_options')) {
+		a360_check_nonce($_POST['a360_nonce'], $_POST['a360_action']);
 		switch ($_POST['a360_action']) {
 			case 'update_mc_api_key':
 				if (isset($_POST['a360_username']) && isset($_POST['a360_password'])) {
@@ -538,7 +539,7 @@ function a360_request_handler() {
 			break;
 			case 'revoke_ga_token':
 				global $a360_ga_token;
-				$wp_http = new WP_Http();
+				$wp_http = a360_get_wp_http();
 				$request_args = array(
 					'headers' => a360_get_authsub_headers(),
 					'sslverify' => false
@@ -584,6 +585,15 @@ function a360_request_handler() {
 add_action('init', 'a360_request_handler');
 
 
+function a360_check_nonce($nonce, $action_name) {
+	if (wp_verify_nonce($nonce, $action_name) === false) {
+		wp_die('The page with the command you submitted has expired. Please try again.');
+	}
+}
+function a360_create_nonce($action_name) {
+	return wp_create_nonce($action_name);
+}
+
 function a360_admin_js() {
 	global $a360_api_key, $a360_has_key, $a360_ga_token;
 	header('Content-type: text/javascript');
@@ -621,7 +631,7 @@ function a360_get_authsub_headers($token = null) {
 		// slow, but little other way to guarantee what it'll be running on.
 		// and even if curl is first in the list, WP_Http will try a different 
 		// transport if curl errors out for some reason.
-		$http = new WP_Http();
+		$http = a360_get_wp_http();
 		$transports = $http->_getTransport();
 		$wp_http_likes_curl = count($transports) && (get_class($transports[0]) == 'WP_Http_Curl');
 		if (version_compare($wp_version, '2.8', '<') && $wp_http_likes_curl) {
@@ -898,6 +908,14 @@ if (!function_exists('get_snoopy')) {
 		return new Snoopy;
 	}
 }
+
+function a360_get_wp_http() {
+	if (!class_exists('WP_Http')) {
+		include_once(ABSPATH.WPINC.'/class-http.php');
+	}
+	return new WP_Http();
+}
+
 
 /**
  * JSON ENCODE for PHP < 5.2.0
