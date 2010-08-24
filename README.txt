@@ -4,7 +4,7 @@ Contributors: crowdfavorite, alexkingorg
 Tags: analytics, google-analytics, email, statistics, stats, dashboard
 Requires at least: 2.7
 Tested up to: 3.0
-Stable tag: 1.2.2
+Stable tag: 1.2.3
 
 MailChimp's Analytics360 plugin allows you to pull Google Analytics and MailChimp data directly into your dashboard, so you can access robust analytics tools without leaving WordPress.
 
@@ -77,6 +77,10 @@ Please drop us a line if you find a bug or would like to see a new feature added
 
 
 == Changelog ==
+
+= 1.2.3 =
+
+* Set minimum height of sparkline charts to 30px to match new minimum height requirement in chart API
 
 = 1.2.2 =
 

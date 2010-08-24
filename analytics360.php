@@ -3,7 +3,7 @@
 Plugin Name: Analytics360
 Plugin URI: http://www.mailchimp.com/wordpress_analytics_plugin/?pid=wordpress&source=website
 Description: Allows you to pull Google Analytics and MailChimp data directly into your dashboard, so you can access robust analytics tools without leaving WordPress. Compliments of <a href="http://mailchimp.com/">MailChimp</a>.
-Version: 1.2.2
+Version: 1.2.3
 Author: Crowd Favorite
 Author URI: http://crowdfavorite.com
 */
@@ -24,7 +24,7 @@ else if (is_file(trailingslashit(ABSPATH.PLUGINDIR).dirname(__FILE__).'/'.basena
 	define('A360_FILE', trailingslashit(ABSPATH.PLUGINDIR).dirname(__FILE__).'/'.basename(__FILE__));
 }
 
-define('A360_VERSION', '1.2.2');
+define('A360_VERSION', '1.2.3');
 define('A360_PHP_COMPATIBLE', version_compare(phpversion(), '5', '>='));
 if (!A360_PHP_COMPATIBLE) {
 	trigger_error('Analytics 360&deg; requires PHP 5 or greater.', E_USER_ERROR);

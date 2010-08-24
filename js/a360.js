@@ -455,7 +455,7 @@
 			});
 			spark.draw(table, { 
 				width: 70, 
-				height: 25, 
+				height: 30, 
 				showAxisLines: false, 
 				showValueLabels: false, 
 				labelPosition: 'none'
