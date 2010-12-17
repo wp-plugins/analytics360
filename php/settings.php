@@ -25,9 +25,21 @@
 					';
 				}
 				?>
-				<form id="a360_mc_login_form" name="a360-settings-form" action="<?php echo admin_url('options-general.php');?>" method="post">
+				<form id="a360_mc_login_form" name="a360-settings-form" action="<?php echo admin_url('options-general.php');?>" method="post" autocomplete="off">
 					<input type="hidden" name="a360_action" value="update_mc_api_key" />
 					<input type="hidden" name="a360_nonce" value="<?php echo a360_create_nonce('update_mc_api_key'); ?>" />
+					<fieldset class="options">
+						<p class="a360-want-key"<?php echo ($a360_has_key ? ' style="display:none;"' : '');?>>
+							Enter your <a href="https://us1.admin.mailchimp.com/account/api-key-popup" target="_blank">API Key</a>. This key will power Analytics360&deg;.
+						</p>
+						<div class="option a360-want-key"<?php echo ($a360_has_key ? ' style="display:none;"' : '');?>>
+							<label for="a360_api_key">API Key</label>
+							<input type="text" size="32" value="<?php echo $a360_api_key;?>" id="a360_api_key" name="a360_api_key" />
+						</div>
+					</fiedlset>
+					<p>
+						<h3 class="a360-want-key"<?php echo ($a360_has_key ? ' style="display:none;"' : '');?>>- OR -</h2>
+					</p>
 					<fieldset class="options">
 						<p class="a360-want-key"<?php echo ($a360_has_key ? ' style="display:none;"' : '');?>>
 							Enter your MailChimp username and password to generate an API key. This key will power Analytics360&deg;.

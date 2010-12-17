@@ -3,7 +3,7 @@
 Plugin Name: Analytics360
 Plugin URI: http://www.mailchimp.com/wordpress_analytics_plugin/?pid=wordpress&source=website
 Description: Allows you to pull Google Analytics and MailChimp data directly into your dashboard, so you can access robust analytics tools without leaving WordPress. Compliments of <a href="http://mailchimp.com/">MailChimp</a>.
-Version: 1.2.3
+Version: 1.2.4
 Author: Crowd Favorite
 Author URI: http://crowdfavorite.com
 */
@@ -24,7 +24,7 @@ else if (is_file(trailingslashit(ABSPATH.PLUGINDIR).dirname(__FILE__).'/'.basena
 	define('A360_FILE', trailingslashit(ABSPATH.PLUGINDIR).dirname(__FILE__).'/'.basename(__FILE__));
 }
 
-define('A360_VERSION', '1.2.3');
+define('A360_VERSION', '1.2.4');
 define('A360_PHP_COMPATIBLE', version_compare(phpversion(), '5', '>='));
 if (!A360_PHP_COMPATIBLE) {
 	trigger_error('Analytics 360&deg; requires PHP 5 or greater.', E_USER_ERROR);
@@ -518,8 +518,13 @@ function a360_request_handler() {
 		a360_check_nonce($_POST['a360_nonce'], $_POST['a360_action']);
 		switch ($_POST['a360_action']) {
 			case 'update_mc_api_key':
-				if (isset($_POST['a360_username']) && isset($_POST['a360_password'])) {
+				if (!empty($_POST['a360_api_key']) && isset($_POST['a360_api_key'])) {
+					$key_result = a360_validate_API_key($_POST['a360_api_key']);
+				}
+			    else if (isset($_POST['a360_username']) && isset($_POST['a360_password'])) {
 					$key_result = a360_fetch_API_key($_POST['a360_username'], $_POST['a360_password']);
+				}
+				if (!empty($key_result)) {
 					if ($key_result['success']) {
 						delete_option('a360_chimp_chatter_url');
 						update_option('a360_api_key', $key_result['api_key']);
@@ -653,14 +658,14 @@ function a360_admin_menu() {
 		add_options_page(
 			__('Settings', 'analytics360'),
 			__('Analytics360°', 'analytics360'),
-			10,
+			'manage_options',
 			basename(__FILE__),
 			'a360_settings_form'
 		);
 		add_dashboard_page(
 			__('Dashboard', 'analytics360'),
 			__('Analytics360°', 'analytics360'),
-			10,
+			'manage_options',
 			basename(__FILE__),
 			'a360_dashboard'
 		);
@@ -812,7 +817,23 @@ function a360_fetch_API_key($username, $password) {
 	);
 }
 
-
+function a360_validate_API_key($key) {
+	if (!class_exists('MCAPI')) {
+		include_once(ABSPATH.PLUGINDIR.'/analytics360/php/MCAPI.class.php');
+	}
+	$api = new MCAPI($key, null, true);
+	$api->ping();
+	if ($api->errorCode) {
+		return array(
+			'success' => false,
+			'error' => $api->errorMessage
+		);
+	}
+	return array(
+		'success' => true,
+		'api_key' => $api->api_key
+	);
+}
 
 /**
  * Adapted from: 
@@ -915,7 +936,6 @@ function a360_get_wp_http() {
 	}
 	return new WP_Http();
 }
-
 
 /**
  * JSON ENCODE for PHP < 5.2.0
