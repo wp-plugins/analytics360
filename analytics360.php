@@ -3,7 +3,7 @@
 Plugin Name: Analytics360
 Plugin URI: http://www.mailchimp.com/wordpress_analytics_plugin/?pid=wordpress&source=website
 Description: Allows you to pull Google Analytics and MailChimp data directly into your dashboard, so you can access robust analytics tools without leaving WordPress. Compliments of <a href="http://mailchimp.com/">MailChimp</a>.
-Version: 1.2.4
+Version: 1.2.5
 Author: Crowd Favorite
 Author URI: http://crowdfavorite.com
 */
@@ -627,29 +627,13 @@ function a360_admin_js() {
 }
 
 /**
- * Work around a bug in WP 2.7's implementation of WP_Http running on cURL.
+ * Formerly worked around a bug in WP 2.7's implementation of WP_Http 
+ * running on cURL. Left in for legacy reasons, to remove in the future
+ * after thorough testing.
  */
 function a360_get_authsub_headers($token = null) {
-	global $wp_version, $a360_ga_token;
-	static $use_assoc = null;
-	if (is_null($use_assoc)) {
-		// slow, but little other way to guarantee what it'll be running on.
-		// and even if curl is first in the list, WP_Http will try a different 
-		// transport if curl errors out for some reason.
-		$http = a360_get_wp_http();
-		$transports = $http->_getTransport();
-		$wp_http_likes_curl = count($transports) && (get_class($transports[0]) == 'WP_Http_Curl');
-		if (version_compare($wp_version, '2.8', '<') && $wp_http_likes_curl) {
-			$use_assoc = false;
-		}
-		else {
-			$use_assoc = true;
-		}
-	}
+	global $a360_ga_token;
 	$token = (is_null($token) ? $a360_ga_token : $token);
-	if (!$use_assoc) {
-		return array('Authorization: AuthSub token="'.$token.'"');
-	}
 	return array('Authorization' => 'AuthSub token="'.$token.'"');
 }
 
