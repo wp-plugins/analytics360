@@ -134,7 +134,7 @@
 		</div>
 	</div>
 	<div class="a360-box" id="a360-box-mc-content">
-		<iframe frameborder="0" id="a360-mc-content" style="width:100%" src="http://www.mailchimp.com/wpa/wpa-ads.html"></iframe>
+		<iframe frameborder="0" id="a360-mc-content" style="width:100%; height:180px;" src="http://www.mailchimp.com/wpa/wpa-ads.html"></iframe>
 	</div>
 	<div class="a360-box" id="a360-box-mailchimp-activity">
 		<div class="a360-box-header"><h3>MailChimp Activity</h3><div class="a360-box-status"></div></div>
@@ -146,8 +146,7 @@
 				else {
 					?>
 					<p>
-						MailChimp activity can't be shown because you have not connected to a MailChimp Account.
-						<a href="<?php site_url('/wp-admin/options-general.php?page=analytics360.php');?>">Connect to or create a MailChimp account</a>.
+						<a href="<?php site_url('/wp-admin/options-general.php?page=analytics360.php');?>">Connect to or create a MailChimp account</a> to show your MailChimp activity.
 					</p>
 					<?php
 				}

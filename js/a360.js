@@ -103,10 +103,10 @@
 				$(element).attr('stroke-width', weight);
 			},
 			setRadius: function(element, radius) {
-				$(element).attr('r').baseVal.value = radius;
+				$(element).attr('r', radius);
 			},
 			setY: function(element, value) {
-				$(element).attr('cy').baseVal.value = value;
+				$(element).attr('cy', value);
 			},
 			getDimensions: function(element) {
 				return { width: parseFloat($(element).get(0).getAttribute('width')), height: parseFloat($(element).get(0).getAttribute('height')) };

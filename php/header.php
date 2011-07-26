@@ -1,8 +1,9 @@
 <div class="wrap a360-wrap">
 	<h2 class="a360-head">
 		<div class="a360-header-links">
-			<a href="http://analytics.google.com">visit Google Analytics &raquo;</a> | 
-			<a href="http://mailchimp.com">visit MailChimp &raquo;</a>
+			<a href="http://analytics.google.com">visit Google Analytics</a>
+			<span>|</span>
+			<a href="http://mailchimp.com">visit MailChimp</a>
 		</div>
 		<?php echo __('Analytics360°', 'analytics360'); ?>
 	</h2>

@@ -21,13 +21,16 @@ h2.a360-head {
 	font-size:32px;
 	border-bottom:1px solid #888;
 	margin-top:25px;
+	padding-right: 0;
 }
 #a360-header-credit {
-	margin-top:8px;
-	line-height:24px;
+	margin-bottom: 14px;
+	margin-top:10px;
+	line-height:28px;
 	position:relative;	
 }
 .a360-wrap {
+	margin-right: 20px;
 	position:relative;
 }
 .a360-subhead {
@@ -99,32 +102,26 @@ h2.a360-head {
 	font-style:normal;
 	font-weight:bold;
 	font-family:Helvetica, Arial, sans-serif;
+	text-decoration: none;
+}
+.a360-header-links a {
+	text-decoration: none;
+}
+.a360-header-links span {
+	padding: 0 5px;
 }
 
-.a360-header-links a {
-	margin:0 5px;
-}
 label[for=a360-ga-select-profile] {
 	font-weight:bold;
 	margin-right:10px;
 }
 
 .a360-box {
-/*	
-	border:1px solid #bbb;
-	-moz-border-radius:3px;
-	-webkit-border-radius:3px;
-*/
 	color:#333;
 	background:#f4f4f4;
-	margin:1%;
+	margin-bottom: 15px;
 	padding:0;
 	clear:both;
-
-	-moz-border-radius-topleft:8px;
-	-moz-border-radius-topright:8px;
-	-webkit-border-top-left-radius:8px;
-	-webkit-border-top-right-radius:8px;
 	position:relative;
 }
 .a360-box.half {
@@ -156,6 +153,7 @@ label[for=a360-ga-select-profile] {
 }
 .a360-box-header h3 {
 	float:left;
+	line-height: 1.5em;
 	margin:0;
 	color:#555;
 }
@@ -167,7 +165,6 @@ label[for=a360-ga-select-profile] {
 /*	padding:5px 8px;*/
 	overflow:hidden;
 	border-top:1px solid #d8d8d8;
-	border-bottom:1px solid #ddd;
 	position:relative;
 	clear:both;
 }
@@ -399,7 +396,6 @@ a.a360-outgoing:hover {
 }
 .a360-table-header td {
 	background:#e8e8e8;
-	border:1px solid #bbb;
 }
 .a360-table-row {
 	border:1px solid #ddd;
@@ -445,7 +441,7 @@ a.a360-outgoing:hover {
 	height:40px;
 	z-index:1000;
 	position:absolute;
-	top:56px;
+	top:50px;
 	right:0;
 }
 #a360-datepicker-popup {
@@ -454,7 +450,7 @@ a.a360-outgoing:hover {
 	right:0;
 	padding:10px;
 	height:16px;
-	width:256px;
+	width:240px;
 	background: url(<?php echo plugins_url('/analytics360/images/datepicker.gif');?>) no-repeat;
 }
 #a360-datepicker-popup.hover {
@@ -492,7 +488,7 @@ a.a360-outgoing:hover {
 	border:1px solid #aaa;
 	background:#fff;
 	position:absolute;
-	right:21px;
+	right:5px;
 	top: 35px;
 	-moz-border-radius-topleft:4px;
 	-moz-border-radius-bottomleft:4px;
