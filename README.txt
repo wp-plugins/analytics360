@@ -60,7 +60,7 @@ This is a known issue with Google Data API authentication, affecting some domain
 
 = How do I report a bug or feature request? =
 
-Please drop us a line if you find a bug or would like to see a new feature added at:   [http://groups.google.com/group/analytics360-discussion](http://groups.google.com/group/analytics360-discussion). You can also contact the [WordPress HelpCenter](http://wphelpcenter.com/) for immediate support requests.
+Please drop us a line if you find a bug or would like to see a new feature added at:   [http://groups.google.com/group/analytics360-discussion](http://groups.google.com/group/analytics360-discussion).
 
 = Who created this plugin? =
 

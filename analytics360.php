@@ -3,19 +3,16 @@
 Plugin Name: Analytics360
 Plugin URI: http://www.mailchimp.com/wordpress_analytics_plugin/?pid=wordpress&source=website
 Description: Allows you to pull Google Analytics and MailChimp data directly into your dashboard, so you can access robust analytics tools without leaving WordPress. Compliments of <a href="http://mailchimp.com/">MailChimp</a>.
-Version: 1.2.5
+Version: 1.2.6
 Author: Crowd Favorite
 Author URI: http://crowdfavorite.com
 */
 
 // ini_set('display_errors', '1'); ini_set('error_reporting', E_ALL);
 
-if (!defined('PLUGINDIR')) {
-	define('PLUGINDIR','wp-content/plugins');
-}
+define('A360_VERSION', '1.2.6');
 
 load_plugin_textdomain('analytics360');
-
 
 if (is_file(trailingslashit(ABSPATH.PLUGINDIR).basename(__FILE__))) {
 	define('A360_FILE', trailingslashit(ABSPATH.PLUGINDIR).basename(__FILE__));
@@ -24,12 +21,10 @@ else if (is_file(trailingslashit(ABSPATH.PLUGINDIR).dirname(__FILE__).'/'.basena
 	define('A360_FILE', trailingslashit(ABSPATH.PLUGINDIR).dirname(__FILE__).'/'.basename(__FILE__));
 }
 
-define('A360_VERSION', '1.2.4');
 define('A360_PHP_COMPATIBLE', version_compare(phpversion(), '5', '>='));
 if (!A360_PHP_COMPATIBLE) {
 	trigger_error('Analytics 360&deg; requires PHP 5 or greater.', E_USER_ERROR);
 }
-
 
 function a360_admin_init() {
 	global $a360_page, $pagenow;
@@ -142,7 +137,7 @@ function a360_troubleshoot_message($error = '') {
 		<p>If you\'re having trouble getting up and running, you might try one of the following resources:</p>
 		<ul>
 			<li><a href="http://groups.google.com/group/analytics360-discussion">The Analytics360&deg; Google Group</a></li>
-			<li><a href="http://wphelpcenter.com/">WordPress HelpCenter</a>, (512) 788-9236</li>
+			<li><a href="http://wordpress.org/support/">WordPress Support Forums</a></li>
 		</ul>
 	';
 	return $result;
