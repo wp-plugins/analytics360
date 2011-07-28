@@ -175,16 +175,15 @@
 			a360.gfx.setAttribute(chartFill, 'd', d);
 		}
 		else {
-			// vml freaks out if you give it floats
-			var d = 'm ' + interpValues[0].x + ',' + Math.round(interpValues[0].y);
+			// vml freaks out if you give it floats - rounding solves this but creates minor visual offsets
+			var d = 'm ' + Math.round(interpValues[0].x) + ',' + Math.round(interpValues[0].y);
 			d += ' l ';
 			$.each(interpValues, function(i, coord) {
-				d += coord.x + ',' + Math.round(coord.y) + ' ';
+				d += Math.round(coord.x) + ',' + Math.round(coord.y) + ' ';
 			});
-
 			a360.gfx.setAttribute(chartLine, 'v', d + ' e');
-			d += interpValues[interpValues.length - 1].x + ',' + (a360.lineChart.height + a360.lineChart.offsetY) + ' ';
-			d += interpValues[0].x + ',' + (a360.lineChart.height + a360.lineChart.offsetY);
+			d += Math.round(interpValues[interpValues.length - 1].x) + ',' + Math.round(a360.lineChart.height + a360.lineChart.offsetY) + ' ';
+			d += Math.round(interpValues[0].x) + ',' + Math.round(a360.lineChart.height + a360.lineChart.offsetY);
 			a360.gfx.setAttribute(chartFill, 'v', d + ' x');
 		}
 	};
@@ -751,8 +750,8 @@
 				y: offset.top 
 			});
 			endCoords.push({ 
-				x: offset.left,
-				y: valueToY(a360.lineChart.visitData.getProperty(index, 1, 'dayStats').getVisits(mediumFilter) || 0)
+				x: Math.round(offset.left),
+				y: Math.round(valueToY(a360.lineChart.visitData.getProperty(index, 1, 'dayStats').getVisits(mediumFilter) || 0))
 			});
 		});
 		
@@ -765,7 +764,7 @@
 		}
 
 		var frame = 0;
-		var nFrames = 20;
+		var nFrames = (a360.gfx.renderer == 'svg' ? 25 : 5);
 		setTimeout(function() {
 			if (frame <= nFrames) {
 				setTimeout(arguments.callee, 25);
