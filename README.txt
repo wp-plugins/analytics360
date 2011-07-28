@@ -78,6 +78,11 @@ Please drop us a line if you find a bug or would like to see a new feature added
 
 == Changelog ==
 
+= 1.2.6 =
+
+* Update dashboard styling to better match WordPress 3.2 admin UI.
+* Revisions for IE compatibility.
+
 = 1.2.5 =
 
 * Compatibility with WordPress 3.2 (removed compatibility patch for WP 2.7 that was breaking 3.2)

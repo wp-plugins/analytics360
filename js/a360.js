@@ -141,8 +141,8 @@
 		var chartFill = null;
 		
 		if (a360.gfx.renderer == 'svg') {
-			var chartLine = $('path[stroke=#92BCD0]');
-			var chartFill = $('path[fill=#92BCD0]');
+			var chartLine = $('path[stroke="#92BCD0"]');
+			var chartFill = $('path[fill="#92BCD0"]');
 		}
 		else {
 			var nShapes = $('shape').size();
@@ -862,7 +862,7 @@
 					a360.lineChart.bottomLineValue = yAxisValues[0];
 					
 					// copy a background "all traffic" fill area
-					var chartFill = $('path[fill=#92BCD0]');
+					var chartFill = $('path[fill="#92BCD0"]');
 					a360.gfx.setFillColor(chartFill.clone().insertBefore(chartFill), '#cfcfcf');
 				}
 				else {
