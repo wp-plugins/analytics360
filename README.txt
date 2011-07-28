@@ -80,8 +80,9 @@ Please drop us a line if you find a bug or would like to see a new feature added
 
 = 1.2.6 =
 
-* Update dashboard styling to better match WordPress 3.2 admin UI.
-* Revisions for IE compatibility.
+* Update dashboard styling to better match WordPress 3.2 admin UI
+* IE compatibility
+* jQuery version compatibility
 
 = 1.2.5 =
 
