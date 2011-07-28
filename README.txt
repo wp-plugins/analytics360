@@ -83,6 +83,7 @@ Please drop us a line if you find a bug or would like to see a new feature added
 * Update dashboard styling to better match WordPress 3.2 admin UI
 * IE compatibility
 * jQuery version compatibility
+* Known issue: Traffic By Region map is not displaying correctly in IE9
 
 = 1.2.5 =
 
