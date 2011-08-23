@@ -475,8 +475,8 @@
 			table.setValue(i, 0, row.country);
 			table.setValue(i, 1, parseInt(row.visits, 10));
 		});
-		var geomap = new google.visualization.GeoMap($('#a360-geo-map').empty().get(0));
-		geomap.draw(table, { dataMode: 'regions', width:'600px', colors: [0xC1D8EC, 0xD98E26] });
+		var geochart = new google.visualization.GeoChart($('#a360-geo-map').empty().get(0));
+		geochart.draw(table, { dataMode: 'regions', backgroundColor: '#EAF7FE', width:'600px', colors: ['#C1D8EC', '#D98E26'] });
 	};
 		
 	a360.updateReferralMediumChart = function(event, data) {
@@ -1160,7 +1160,7 @@
 	};
 	
 	a360.Table.prototype.draw = function(container) {
-		
+
 		this.jqContainer = $(container);
 		
 		this.tableViz = new google.visualization.Table(this.jqContainer.empty().get(0));

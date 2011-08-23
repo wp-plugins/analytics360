@@ -78,6 +78,11 @@ Please drop us a line if you find a bug or would like to see a new feature added
 
 == Changelog ==
 
+= 1.2.7 =
+
+* Inclusion of wp-includes/rss.php switched to wp-includes/class-simplepie.php as rss.php was deprecated in WP 3.0.
+* Changed GeoMap to GeoChart for the world map widget.
+
 = 1.2.6 =
 
 * Update dashboard styling to better match WordPress 3.2 admin UI

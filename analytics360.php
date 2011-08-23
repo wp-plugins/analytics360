@@ -3,14 +3,14 @@
 Plugin Name: Analytics360
 Plugin URI: http://www.mailchimp.com/wordpress_analytics_plugin/?pid=wordpress&source=website
 Description: Allows you to pull Google Analytics and MailChimp data directly into your dashboard, so you can access robust analytics tools without leaving WordPress. Compliments of <a href="http://mailchimp.com/">MailChimp</a>.
-Version: 1.2.6
+Version: 1.2.7
 Author: Crowd Favorite
 Author URI: http://crowdfavorite.com
 */
 
 // ini_set('display_errors', '1'); ini_set('error_reporting', E_ALL);
 
-define('A360_VERSION', '1.2.6');
+define('A360_VERSION', '1.2.7');
 
 load_plugin_textdomain('analytics360');
 
@@ -29,7 +29,7 @@ if (!A360_PHP_COMPATIBLE) {
 function a360_admin_init() {
 	global $a360_page, $pagenow;
 	$a360_page = null;
-	if ($_GET['page'] == 'analytics360.php') {
+	if (isset($_GET['page']) && $_GET['page'] == 'analytics360.php') {
 		$a360_page = (
 			$pagenow == 'options-general.php' ? 'settings' : (
 				$pagenow == 'index.php' ? 'dashboard' : '' )
@@ -38,7 +38,7 @@ function a360_admin_init() {
 	
 	if ($a360_page == 'dashboard') {
 		header('X-UA-Compatible: IE=7');	// ask ie8 to behave like ie7 for the sake of vml
-		require_once(trailingslashit(ABSPATH).'wp-includes/rss.php');
+		require_once(trailingslashit(ABSPATH).'wp-includes/class-simplepie.php');
 	}
 
 	if ($a360_page == 'dashboard') {
@@ -68,7 +68,7 @@ function a360_admin_head() {
 				<script type="text/javascript">
 					if (typeof google !== \'undefined\') {
 						google.load("gdata", "1");
-						google.load("visualization", "1", {"packages": ["areachart", "table", "piechart", "imagesparkline", "geomap", "columnchart"]});
+						google.load("visualization", "1", {"packages": ["areachart", "table", "piechart", "imagesparkline", "geochart", "columnchart"]});
 					}
 				</script>
 			';
@@ -714,27 +714,30 @@ function a360_dashboard() {
 
 function a360_render_chimp_chatter() {
 	$rss = a360_get_chimp_chatter(10);
-	echo '<ul id="chatter-messages">';
-	foreach ((array)$rss->items as $item) {
-		printf(
-			'<li class="'.$item['category'].'"><a href="%1$s" title="%2$s">%3$s</a></li>',
-			clean_url($item['link']),
-			attribute_escape(strip_tags($item['description'])),
-			$item['title']
-		);
+	if ($rss !== false) {
+		echo '<ul id="chatter-messages">';
+		foreach ((array)$rss->items as $item) {
+			printf(
+				'<li class="'.$item['category'].'"><a href="%1$s" title="%2$s">%3$s</a></li>',
+				clean_url($item['link']),
+				attribute_escape(strip_tags($item['description'])),
+				$item['title']
+			);
+		}
+		echo '</ul>';
 	}
-	echo '</ul>';
 }
 
 function a360_get_chimp_chatter($num_items = -1) {
 	$url = a360_get_chimp_chatter_url();
 	if ($url) {
-		if ($rss = fetch_rss($url)) {	// intentional assignment
-			
-			if ($num_items !== -1) {
-				$rss->items = array_slice($rss->items, 0, $num_items);
+		if ($rss = fetch_feed($url)) {	// intentional assignment
+			if (!is_wp_error($rss)) {
+				if ($num_items !== -1) {
+					$rss->items = array_slice($rss->items, 0, $num_items);
+				}
+				return $rss;
 			}
-			return $rss;
 		}
 	}
 	return false;

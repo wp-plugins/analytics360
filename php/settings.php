@@ -117,6 +117,7 @@
 				$request_args
 			);
 
+			$connection_errors = array();
 			if (is_wp_error($result)) {
 				$connection_errors = $result->get_error_messages();
 			}
